@@ -1,23 +1,34 @@
-import dotenv from "dotenv";
-import React from "react";
 import { useState } from "react";
-import { Configuration, OpenAIApi } from "openai";
+import dotenv from "dotenv";
+import { openai } from "../openAi";
 
 dotenv.config();
 
 export function App() {
-  console.log(process.env.OPENAI_API_KEY);
   const [inputValue, setInputValue] = useState("");
-  //   const []
-  const submitText = async () => {
-    console.log("submitText");
-    // const configuration = new Configuration({
-    //   organization: "org-haoyZsSbhi7ckZe0uoCcv9ad",
-    //   apiKey: process.env.OPENAI_API_KEY,
-    // });
-    // const openai = new OpenAIApi(configuration);
-    // const response = await openai.listEngines();
-    // console.log({ response });
+  const [prompt, setPrompt] = useState("");
+  const [apiResponse, setApiResponse] = useState("");
+  const [loading, setLoading] = useState(false);
+  console.log("apiResponse", apiResponse);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const result = await openai.createCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: "Hello world" }],
+        // prompt: inputValue,
+        // temperature: 0.5,
+        // max_tokens: 4000,
+      });
+      //console.log("response", result.data.choices[0].text);
+      setApiResponse(result.data.choices[0].text);
+    } catch (e) {
+      //console.log(e);
+      setApiResponse("Something is going wrong, Please try again.");
+    }
+    setLoading(false);
   };
 
   return (
@@ -30,7 +41,7 @@ export function App() {
           //   console.log(e.target.value);
         }}
       />
-      <button type="button" onClick={submitText}>
+      <button type="button" onClick={handleSubmit}>
         確認
       </button>
     </>
